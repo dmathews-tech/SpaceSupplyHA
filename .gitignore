@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Runtime exports not for repo
+*.log
+*.bak
+*.rollback*
+ha/home-assistant.log*

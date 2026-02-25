@@ -1,0 +1,279 @@
+play_pi_file:
+  alias: 'Pi: Play File'
+  description: Play selected media to selected player. Supports fixed show file or
+    picker source.
+  fields:
+    pi_id:
+      name: Target player suffix
+      description: Entity suffix used as media_player.pi_id
+      selector:
+        select:
+          options:
+          - p1
+          - p2
+          - p3
+          - p4
+          - p5
+          - p6
+          - p7
+          - p8
+          - p9
+          - p10
+          - a_wall
+          - wall_b
+          custom_value: true
+          sort: false
+    file_name:
+      name: Show file name
+      description: Optional. Maps to /local/file_name.mp4
+      selector:
+        select:
+          options:
+          - p1
+          - p2
+          - p3
+          - p4
+          - p5
+          - p6
+          - p7
+          - p8
+          - p9
+          - p10
+          custom_value: true
+          sort: false
+    media_file:
+      name: Media picker
+      description: Optional. Pick from Home Assistant media browser
+      selector:
+        media: {}
+  sequence:
+  - variables:
+      resolved_media: '{% if media_file is defined and media_file %}{{ media_file
+        }}{% else %}{{ ''http://192.168.0.10:8123/local/'' ~ file_name ~ ''.mp4''
+        }}{% endif %}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ pi_id is defined and (pi_id | regex_match(''^p(10|[1-9])$''))
+          }}'
+      sequence:
+      - action: input_text.set_value
+        data:
+          entity_id: input_text.{{ pi_id }}_trigger_mode
+          value: '{{ ''Screensaver'' if (file_name is defined and ''screen'' in (file_name
+            | lower)) else ''Playback'' }}'
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.{{ pi_id }}
+    data:
+      media_content_id: '{{ resolved_media }}'
+      media_content_type: movie
+reset_pi_hardware:
+  alias: 'Pi: Hardware Reset'
+  sequence:
+  - action: shell_command.reset_pi
+    data:
+      target: '{{ pi_id }}'
+play_android_file:
+  alias: 'Android: Play File'
+  sequence:
+  - action: media_player.play_media
+    target:
+      entity_id: '{{ target_entity }}'
+    data:
+      media_content_id: http://192.168.0.10:8123/local/{{ file_name }}.mp4
+      media_content_type: video/mp4
+holodeck_play_both:
+  alias: 'Holodeck: Play Both (p6 & p7)'
+  sequence:
+  - action: script.play_android_file
+    data:
+      target_entity: media_player.epson_ls800_a
+      file_name: p6
+  - delay: 00:00:02
+  - action: script.play_android_file
+    data:
+      target_entity: media_player.epson_ls800_b
+      file_name: p7
+holodeck_power_off_both:
+  alias: 'Holodeck: Power Off Both'
+  sequence:
+  - action: media_player.turn_off
+    target:
+      entity_id:
+      - media_player.epson_ls800_a
+      - media_player.epson_ls800_b
+toggle_p1_trigger_mode:
+  alias: Toggle p1 Trigger Mode
+  sequence:
+  - variables:
+      next_mode: '{{ ''Screensaver'' if states(''input_text.p1_trigger_mode'') !=
+        ''Screensaver'' else ''Playback'' }}'
+      next_file: '{{ ''p1_screensaver'' if states(''input_text.p1_trigger_mode'')
+        != ''Screensaver'' else ''p1'' }}'
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.p1_trigger_mode
+    data:
+      value: '{{ next_mode }}'
+  - action: script.play_pi_file
+    data:
+      pi_id: p1
+      file_name: '{{ next_file }}'
+toggle_p2_trigger_mode:
+  alias: Toggle p2 Trigger Mode
+  sequence:
+  - variables:
+      next_mode: '{{ ''Screensaver'' if states(''input_text.p2_trigger_mode'') !=
+        ''Screensaver'' else ''Playback'' }}'
+      next_file: '{{ ''p2_screensaver'' if states(''input_text.p2_trigger_mode'')
+        != ''Screensaver'' else ''p2'' }}'
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.p2_trigger_mode
+    data:
+      value: '{{ next_mode }}'
+  - action: script.play_pi_file
+    data:
+      pi_id: p2
+      file_name: '{{ next_file }}'
+toggle_p3_trigger_mode:
+  alias: Toggle p3 Trigger Mode
+  sequence:
+  - variables:
+      next_mode: '{{ ''Screensaver'' if states(''input_text.p3_trigger_mode'') !=
+        ''Screensaver'' else ''Playback'' }}'
+      next_file: '{{ ''p3_screensaver'' if states(''input_text.p3_trigger_mode'')
+        != ''Screensaver'' else ''p3'' }}'
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.p3_trigger_mode
+    data:
+      value: '{{ next_mode }}'
+  - action: script.play_pi_file
+    data:
+      pi_id: p3
+      file_name: '{{ next_file }}'
+toggle_p4_trigger_mode:
+  alias: Toggle p4 Trigger Mode
+  sequence:
+  - variables:
+      next_mode: '{{ ''Screensaver'' if states(''input_text.p4_trigger_mode'') !=
+        ''Screensaver'' else ''Playback'' }}'
+      next_file: '{{ ''p4_screensaver'' if states(''input_text.p4_trigger_mode'')
+        != ''Screensaver'' else ''p4'' }}'
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.p4_trigger_mode
+    data:
+      value: '{{ next_mode }}'
+  - action: script.play_pi_file
+    data:
+      pi_id: p4
+      file_name: '{{ next_file }}'
+toggle_p5_trigger_mode:
+  alias: Toggle p5 Trigger Mode
+  sequence:
+  - variables:
+      next_mode: '{{ ''Screensaver'' if states(''input_text.p5_trigger_mode'') !=
+        ''Screensaver'' else ''Playback'' }}'
+      next_file: '{{ ''p5_screensaver'' if states(''input_text.p5_trigger_mode'')
+        != ''Screensaver'' else ''p5'' }}'
+  - action: input_text.set_value
+    target:
+      entity_id: input_text.p5_trigger_mode
+    data:
+      value: '{{ next_mode }}'
+  - action: script.play_pi_file
+    data:
+      pi_id: p5
+      file_name: '{{ next_file }}'
+force_hdmi1_both:
+  alias: Force HDMI1 Both
+  sequence:
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.epson_ls800_a
+    data:
+      source: HDMI 1
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.epson_ls800_b
+    data:
+      source: HDMI 1
+    continue_on_error: true
+launch_shuttle_experience:
+  alias: Launch Shuttle Experience
+  sequence:
+  - action: light.turn_on
+    target:
+      entity_id: light.h6811
+  - parallel:
+    - action: media_player.play_media
+      target:
+        entity_id: media_player.firetv_television
+      data:
+        media_content_id: http://192.168.0.10:8123/local/p1.mp4
+        media_content_type: movie
+    - action: media_player.play_media
+      target:
+        entity_id: media_player.firetv_2aab23fa1b361d7b_television
+      data:
+        media_content_id: http://192.168.0.10:8123/local/p1.mp4
+        media_content_type: movie
+  mode: single
+probe_cast_pair:
+  alias: Probe Cast Pair (a_wall+b_wall)
+  sequence:
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.epson_ls800_a
+    data:
+      media_content_id: http://192.168.0.10:8123/local/p1.mp4
+      media_content_type: movie
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.epson_ls800_b
+    data:
+      media_content_id: http://192.168.0.10:8123/local/p1.mp4
+      media_content_type: movie
+    continue_on_error: true
+probe_android_pair:
+  alias: Probe Android Pair (epson_a+epson_b)
+  sequence:
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.epson_ls800_a
+    data:
+      media_content_id: http://192.168.0.10:8123/local/p1.mp4
+      media_content_type: movie
+  - action: media_player.play_media
+    target:
+      entity_id: media_player.epson_ls800_b
+    data:
+      media_content_id: http://192.168.0.10:8123/local/p1.mp4
+      media_content_type: movie
+    continue_on_error: true
+
+
+holodeck_stop_and_hdmi1_both:
+  alias: "Holodeck: Stop + HDMI1 Both"
+  sequence:
+  - action: media_player.media_stop
+    target:
+      entity_id:
+      - media_player.epson_ls800_a
+      - media_player.epson_ls800_b
+  - delay: 00:00:02
+  - action: script.force_hdmi1_both
+
+holodeck_rainbow_idle:
+  alias: "Holodeck: Rainbow Idle (HDMI1)"
+  sequence:
+  - action: media_player.media_stop
+    target:
+      entity_id:
+      - media_player.epson_ls800_a
+      - media_player.epson_ls800_b
+  - delay: 00:00:01
+  - action: script.force_hdmi1_both

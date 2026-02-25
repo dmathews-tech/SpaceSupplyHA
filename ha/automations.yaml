@@ -1,0 +1,374 @@
+- alias: Mars Room-Based Motion Control
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.3rsb22bz_shuttle_motion
+    - binary_sensor.third_reality_inc_3rms16bz_2
+    - binary_sensor.3rms16bz_greenhouse_motion
+    - binary_sensor.3rms16bz_galley_motion
+    - binary_sensor.third_reality_inc_3rms16bz_4
+    to: 'on'
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''binary_sensor.3rsb22bz_shuttle_motion''
+          }}'
+      - condition: state
+        entity_id: input_boolean.p1_motion_enabled
+        state: 'on'
+      - condition: template
+        value_template: '{% set last = states(''input_datetime.shuttle_last_play_trigger'')
+          %} {% set guard = states(''input_number.lounge_trigger_guard_minutes'')
+          | float(10) * 60 %} {% if last in [''unknown'',''unavailable'',''none'','''']
+          %}true{% else %}{{ (as_timestamp(now()) - as_timestamp(last)) > guard }}{%
+          endif %}'
+      sequence:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.shuttle_last_play_trigger
+        data:
+          datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      - action: script.play_pi_file
+        data:
+          pi_id: p1
+          file_name: p1
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''binary_sensor.third_reality_inc_3rms16bz_2''
+          }}'
+      - condition: template
+        value_template: '{% set last = states(''input_datetime.control_room_last_play_trigger'')
+          %} {% set guard = states(''input_number.lounge_trigger_guard_minutes'')
+          | float(10) * 60 %} {% if last in [''unknown'',''unavailable'',''none'','''']
+          %}true{% else %}{{ (as_timestamp(now()) - as_timestamp(last)) > guard }}{%
+          endif %}'
+      sequence:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.control_room_last_play_trigger
+        data:
+          datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      - if:
+        - condition: state
+          entity_id: input_boolean.p2_motion_enabled
+          state: 'on'
+        then:
+        - action: script.play_pi_file
+          data:
+            pi_id: p2
+            file_name: p2
+      - if:
+        - condition: state
+          entity_id: input_boolean.p3_motion_enabled
+          state: 'on'
+        then:
+        - action: script.play_pi_file
+          data:
+            pi_id: p3
+            file_name: p3
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''binary_sensor.3rms16bz_greenhouse_motion''
+          }}'
+      - condition: state
+        entity_id: input_boolean.p4_motion_enabled
+        state: 'on'
+      - condition: template
+        value_template: '{% set last = states(''input_datetime.greenhouse_last_play_trigger'')
+          %} {% set guard = states(''input_number.lounge_trigger_guard_minutes'')
+          | float(10) * 60 %} {% if last in [''unknown'',''unavailable'',''none'','''']
+          %}true{% else %}{{ (as_timestamp(now()) - as_timestamp(last)) > guard }}{%
+          endif %}'
+      sequence:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.greenhouse_last_play_trigger
+        data:
+          datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      - action: script.play_pi_file
+        data:
+          pi_id: p4
+          file_name: p4
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''binary_sensor.3rms16bz_galley_motion''
+          }}'
+      - condition: state
+        entity_id: input_boolean.p5_motion_enabled
+        state: 'on'
+      - condition: template
+        value_template: '{% set last = states(''input_datetime.galley_last_play_trigger'')
+          %} {% set guard = states(''input_number.lounge_trigger_guard_minutes'')
+          | float(10) * 60 %} {% if last in [''unknown'',''unavailable'',''none'','''']
+          %}true{% else %}{{ (as_timestamp(now()) - as_timestamp(last)) > guard }}{%
+          endif %}'
+      - condition: state
+        entity_id: timer.p5_play_guard
+        state: idle
+      - condition: state
+        entity_id: timer.p5_idle_reset
+        state: idle
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.p5_play_guard
+        data:
+          duration: '{{ ''%02d:%02d:00'' | format((states(''input_number.lounge_trigger_guard_minutes'')|int(10))
+            // 60, (states(''input_number.lounge_trigger_guard_minutes'')|int(10))
+            % 60) }}'
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.galley_last_play_trigger
+        data:
+          datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      - action: script.play_pi_file
+        data:
+          pi_id: p5
+          file_name: p5
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''binary_sensor.third_reality_inc_3rms16bz_4''
+          }}'
+      - condition: state
+        entity_id: timer.lounge_play_guard
+        state: idle
+      - condition: state
+        entity_id: timer.lounge_idle_reset
+        state: idle
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.lounge_play_guard
+        data:
+          duration: '{{ ''%02d:%02d:00'' | format((states(''input_number.lounge_trigger_guard_minutes'')|int(10))
+            // 60, (states(''input_number.lounge_trigger_guard_minutes'')|int(10))
+            % 60) }}'
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.lounge_last_play_trigger
+        data:
+          datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      - delay: 00:00:01
+      - action: script.play_android_file
+        data:
+          target_entity: media_player.epson_ls800_a
+          file_name: p6
+      - delay: 00:00:01
+      - action: script.play_android_file
+        data:
+          target_entity: media_player.epson_ls800_b
+          file_name: p7
+  id: 2b2c6d7de53847b284d35d90ce6542ab
+- id: standby_button_pending_assignment
+  alias: Standby Button - Pending Assignment
+  description: Placeholder until second Z-Wave button is mapped
+  triggers: []
+  conditions: []
+  actions:
+  - action: media_player.turn_off
+    target:
+      entity_id:
+      - media_player.epson_ls800_a
+      - media_player.epson_ls800_b
+  mode: single
+- id: lounge_guard_end_hdmi1_idle_reset
+  alias: Lounge Guard End -> HDMI1 + Idle Reset
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.lounge_play_guard
+  action:
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.epson_ls800_a
+    data:
+      source: HDMI 1
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.epson_ls800_b
+    data:
+      source: HDMI 1
+    continue_on_error: true
+  - action: timer.start
+    target:
+      entity_id: timer.lounge_idle_reset
+    data:
+      duration: 00:01:00
+  mode: single
+- id: p5_guard_end_screensaver_idle_reset
+  alias: p5 Guard End -> Screensaver + Idle Reset
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.p5_play_guard
+  action:
+  - action: script.play_pi_file
+    data:
+      pi_id: p5
+      file_name: p5_screensaver
+  - action: timer.start
+    target:
+      entity_id: timer.p5_idle_reset
+    data:
+      duration: 00:01:00
+  mode: single
+- id: projectors_on_force_hdmi1
+  alias: Projectors On -> Force HDMI 1
+  trigger:
+  - platform: state
+    entity_id: media_player.epson_ls800_a
+    to: 'on'
+  - platform: state
+    entity_id: media_player.epson_ls800_b
+    to: 'on'
+  action:
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.epson_ls800_a
+    data:
+      source: HDMI 1
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.epson_ls800_b
+    data:
+      source: HDMI 1
+    continue_on_error: true
+  mode: restart
+- id: fleet_pi_online_screensaver
+  alias: Fleet Pi Online -> Screensaver
+  trigger:
+  - platform: state
+    entity_id: media_player.p1
+    from: unavailable
+  - platform: state
+    entity_id: media_player.p2
+    from: unavailable
+  - platform: state
+    entity_id: media_player.p3
+    from: unavailable
+  - platform: state
+    entity_id: media_player.p4
+    from: unavailable
+  - platform: state
+    entity_id: media_player.p5
+    from: unavailable
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''media_player.p1'' }}'
+      sequence:
+      - action: script.play_pi_file
+        data:
+          pi_id: p1
+          file_name: p1_screensaver
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.p1_trigger_mode
+        data:
+          value: Screensaver
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''media_player.p2'' }}'
+      sequence:
+      - action: script.play_pi_file
+        data:
+          pi_id: p2
+          file_name: p2_screensaver
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.p2_trigger_mode
+        data:
+          value: Screensaver
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''media_player.p3'' }}'
+      sequence:
+      - action: script.play_pi_file
+        data:
+          pi_id: p3
+          file_name: p3_screensaver
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.p3_trigger_mode
+        data:
+          value: Screensaver
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''media_player.p4'' }}'
+      sequence:
+      - action: script.play_pi_file
+        data:
+          pi_id: p4
+          file_name: p4_screensaver
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.p4_trigger_mode
+        data:
+          value: Screensaver
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''media_player.p5'' }}'
+      sequence:
+      - action: script.play_pi_file
+        data:
+          pi_id: p5
+          file_name: p5_screensaver
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.p5_trigger_mode
+        data:
+          value: Screensaver
+  mode: restart
+- id: projector_hdmi1_watchdog_museum_safe
+  alias: Projector HDMI1 Watchdog (Museum Safe)
+  trigger:
+  - platform: time_pattern
+    seconds: /15
+  - platform: state
+    entity_id: media_player.epson_ls800_a
+  - platform: state
+    entity_id: media_player.epson_ls800_b
+  condition:
+  - condition: template
+    value_template: '{{ states(''timer.lounge_play_guard'') == ''idle'' }}'
+  - condition: template
+    value_template: '{{ states(''timer.lounge_idle_reset'') in [''idle'',''active'']
+      }}'
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''media_player.epson_ls800_a'',''source'') != ''HDMI 1'' }}'
+      sequence:
+      - action: media_player.select_source
+        target:
+          entity_id: media_player.epson_ls800_a
+        data:
+          source: HDMI 1
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ state_attr(''media_player.epson_ls800_b'',''source'') != ''HDMI 1'' }}'
+      sequence:
+      - action: media_player.select_source
+        target:
+          entity_id: media_player.epson_ls800_b
+        data:
+          source: HDMI 1
+  mode: restart
+- id: launch_button_short_press_shuttle_experience
+  alias: Launch Button Short Press - Shuttle Experience
+  description: One-press launch button keeps Govee H6811 behavior and starts p1.mp4
+    on Shuttle Left/Right HomeKit players.
+  trigger:
+  - platform: event
+    event_type: launch_button_short_press
+  condition: []
+  action:
+  - action: script.launch_shuttle_experience
+  mode: single
