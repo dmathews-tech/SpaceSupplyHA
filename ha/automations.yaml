@@ -227,12 +227,6 @@
     entity_id: media_player.p1
     from: unavailable
   - platform: state
-    entity_id: media_player.p2
-    from: unavailable
-  - platform: state
-    entity_id: media_player.p3
-    from: unavailable
-  - platform: state
     entity_id: media_player.p4
     from: unavailable
   - platform: state
@@ -252,32 +246,6 @@
       - action: input_text.set_value
         target:
           entity_id: input_text.p1_trigger_mode
-        data:
-          value: Screensaver
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.entity_id == ''media_player.p2'' }}'
-      sequence:
-      - action: script.play_pi_file
-        data:
-          pi_id: p2
-          file_name: p2_screensaver
-      - action: input_text.set_value
-        target:
-          entity_id: input_text.p2_trigger_mode
-        data:
-          value: Screensaver
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.entity_id == ''media_player.p3'' }}'
-      sequence:
-      - action: script.play_pi_file
-        data:
-          pi_id: p3
-          file_name: p3_screensaver
-      - action: input_text.set_value
-        target:
-          entity_id: input_text.p3_trigger_mode
         data:
           value: Screensaver
     - conditions:
