@@ -39,7 +39,7 @@
           }}'
       - condition: template
         value_template: '{% set last = states(''input_datetime.control_room_last_play_trigger'')
-          %} {% set guard = states(''input_number.lounge_trigger_guard_minutes'')
+          %} {% set guard = states(''input_number.control_room_trigger_guard_minutes'')
           | float(10) * 60 %} {% if last in [''unknown'',''unavailable'',''none'','''']
           %}true{% else %}{{ (as_timestamp(now()) - as_timestamp(last)) > guard }}{%
           endif %}'
@@ -373,4 +373,16 @@
         value_template: "{{ trigger.entity_id == 'media_player.epson_ls800_b' }}"
       sequence:
       - action: script.show_idle_image_b
+  mode: restart
+
+
+- id: launch_button_double_press_shuttle_reset
+  alias: Launch Button Double Press - Reset Shuttle Video
+  description: Double press resets p1.mp4 playback back to the beginning on both shuttle TVs.
+  trigger:
+  - platform: event
+    event_type: launch_button_double_press
+  condition: []
+  action:
+  - action: script.launch_shuttle_experience_reset
   mode: restart

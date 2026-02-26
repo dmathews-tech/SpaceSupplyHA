@@ -307,3 +307,17 @@ show_idle_images_both:
     continue_on_error: true
   - action: script.show_idle_image_b
     continue_on_error: true
+
+
+launch_shuttle_experience_reset:
+  alias: Launch Shuttle Experience Reset
+  sequence:
+  - action: media_player.media_stop
+    target:
+      entity_id:
+      - media_player.firetv_television
+      - media_player.firetv_2aab23fa1b361d7b_television
+    continue_on_error: true
+  - delay: 00:00:01
+  - action: script.launch_shuttle_experience
+  mode: restart
