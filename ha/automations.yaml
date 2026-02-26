@@ -185,6 +185,7 @@
       entity_id: media_player.epson_ls800_a
     data:
       source: HDMI 1
+    continue_on_error: true
   - action: media_player.select_source
     target:
       entity_id: media_player.epson_ls800_b
@@ -230,6 +231,7 @@
       entity_id: media_player.epson_ls800_a
     data:
       source: HDMI 1
+    continue_on_error: true
   - action: media_player.select_source
     target:
       entity_id: media_player.epson_ls800_b
@@ -337,29 +339,9 @@
   - condition: template
     value_template: '{{ states(''timer.lounge_play_guard'') == ''idle'' }}'
   - condition: template
-    value_template: '{{ states(''timer.lounge_idle_reset'') in [''idle'',''active'']
-      }}'
+    value_template: '{{ states(''timer.lounge_idle_reset'') in [''idle'',''active''] }}'
   action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''media_player.epson_ls800_a'',''source'') != ''HDMI 1'' }}'
-      sequence:
-      - action: media_player.select_source
-        target:
-          entity_id: media_player.epson_ls800_a
-        data:
-          source: HDMI 1
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ state_attr(''media_player.epson_ls800_b'',''source'') != ''HDMI 1'' }}'
-      sequence:
-      - action: media_player.select_source
-        target:
-          entity_id: media_player.epson_ls800_b
-        data:
-          source: HDMI 1
+  - action: script.force_hdmi1_both
   mode: restart
 - id: launch_button_short_press_shuttle_experience
   alias: Launch Button Short Press - Shuttle Experience

@@ -77,12 +77,14 @@ reset_pi_hardware:
 play_android_file:
   alias: 'Android: Play File'
   sequence:
+  - variables:
+      resolved_target: "{{ 'media_player.a_wall' if target_entity == 'media_player.epson_ls800_a' else ('media_player.b_wall' if target_entity == 'media_player.epson_ls800_b' else target_entity) }}"
   - action: media_player.play_media
     target:
-      entity_id: '{{ target_entity }}'
+      entity_id: '{{ resolved_target }}'
     data:
       media_content_id: http://192.168.0.10:8123/local/{{ file_name }}.mp4
-      media_content_type: video/mp4
+      media_content_type: movie
 holodeck_play_both:
   alias: 'Holodeck: Play Both (p6 & p7)'
   sequence:
@@ -193,12 +195,13 @@ force_hdmi1_both:
   sequence:
   - action: media_player.select_source
     target:
-      entity_id: media_player.epson_ls800_a
+      entity_id: media_player.epson_ls800_b
     data:
       source: HDMI 1
+    continue_on_error: true
   - action: media_player.select_source
     target:
-      entity_id: media_player.epson_ls800_b
+      entity_id: media_player.epson_ls800_a
     data:
       source: HDMI 1
     continue_on_error: true
