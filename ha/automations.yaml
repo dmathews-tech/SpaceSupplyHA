@@ -171,18 +171,7 @@
     event_data:
       entity_id: timer.lounge_play_guard
   action:
-  - action: media_player.select_source
-    target:
-      entity_id: media_player.epson_ls800_a
-    data:
-      source: HDMI 1
-    continue_on_error: true
-  - action: media_player.select_source
-    target:
-      entity_id: media_player.epson_ls800_b
-    data:
-      source: HDMI 1
-    continue_on_error: true
+  - action: script.show_idle_images_both
   - action: timer.start
     target:
       entity_id: timer.lounge_idle_reset
@@ -347,3 +336,41 @@
   action:
   - action: script.launch_shuttle_experience
   mode: single
+
+
+- id: lounge_media_end_show_idle_images
+  alias: Lounge Media End -> Idle Images
+  trigger:
+  - platform: state
+    entity_id: media_player.epson_ls800_a
+    to: idle
+    for: 00:00:30
+  - platform: state
+    entity_id: media_player.epson_ls800_a
+    to: 'off'
+    for: 00:00:30
+  - platform: state
+    entity_id: media_player.epson_ls800_b
+    to: idle
+    for: 00:00:30
+  - platform: state
+    entity_id: media_player.epson_ls800_b
+    to: 'off'
+    for: 00:00:30
+  condition:
+  - condition: state
+    entity_id: timer.lounge_play_guard
+    state: idle
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.entity_id == 'media_player.epson_ls800_a' }}"
+      sequence:
+      - action: script.show_idle_image_a
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.entity_id == 'media_player.epson_ls800_b' }}"
+      sequence:
+      - action: script.show_idle_image_b
+  mode: restart

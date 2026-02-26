@@ -280,3 +280,30 @@ holodeck_rainbow_idle:
       - media_player.epson_ls800_b
   - delay: 00:00:01
   - action: script.force_hdmi1_both
+
+
+show_idle_image_a:
+  alias: Show Idle Image A
+  sequence:
+  - action: androidtv_remote.adb_command
+    target:
+      entity_id: remote.a_wall
+    data:
+      command: am start -W -a android.intent.action.VIEW -d file:///sdcard/Download/ProjectorA4k.jpg -t image/jpeg
+
+show_idle_image_b:
+  alias: Show Idle Image B
+  sequence:
+  - action: androidtv_remote.adb_command
+    target:
+      entity_id: remote.wall_b
+    data:
+      command: am start -W -a android.intent.action.VIEW -d file:///sdcard/Download/ProjectorA4k.jpg -t image/jpeg
+
+show_idle_images_both:
+  alias: Show Idle Images Both
+  sequence:
+  - action: script.show_idle_image_a
+    continue_on_error: true
+  - action: script.show_idle_image_b
+    continue_on_error: true
