@@ -285,11 +285,7 @@ holodeck_rainbow_idle:
 show_idle_image_a:
   alias: Show Idle Image A
   sequence:
-  - action: androidtv_remote.adb_command
-    target:
-      entity_id: remote.a_wall
-    data:
-      command: am start -W -a android.intent.action.VIEW -d file:///sdcard/Download/ProjectorA4k.jpg -t image/jpeg
+  - action: shell_command.show_idle_image_a_adb
 
 show_idle_image_b:
   alias: Show Idle Image B
@@ -340,3 +336,14 @@ shuttle_show_idle_wallpapers:
         media_content_id: http://192.168.0.10:8123/local/Projector%20B%204k.jpg
         media_content_type: image/jpeg
   mode: restart
+
+
+control_room_show_wallpaper_b:
+  alias: Control Room Show Wallpaper B (.179)
+  sequence:
+  - action: shell_command.cast_control_room_wallpaper_b
+
+control_room_play_p2_on_179:
+  alias: Control Room Play p2 on .179
+  sequence:
+  - action: shell_command.cast_control_room_play_p2

@@ -419,3 +419,14 @@
   action:
   - action: script.shuttle_show_idle_wallpapers
   mode: restart
+
+
+- id: control_room_179_wallpaper_enforce
+  alias: Control Room .179 -> Enforce Wallpaper B
+  trigger:
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - action: script.control_room_show_wallpaper_b
+  mode: single

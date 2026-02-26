@@ -1,0 +1,152 @@
+# Motion Control Switches for the Mars Dashboard
+input_boolean:
+  p1_motion_enabled: { name: "Shuttle Motion Active", initial: true }
+  p2_motion_enabled: { name: "Control P2 Active", initial: true }
+  p3_motion_enabled: { name: "Control P3 Active", initial: true }
+  p4_motion_enabled: { name: "Greenhouse Active", initial: true }
+  p5_motion_enabled: { name: "Galley Active", initial: true }
+
+# Remote Restart Command
+shell_command:
+  reset_pi: "ssh -i /config/.ssh/id_rsa -o StrictHostKeyChecking=no pi@{{ target }}.local 'sudo systemctl restart pi-button.service jellyfin-shim.service'"
+  show_idle_image_a_adb: "adb connect 192.168.0.11:5555 >/dev/null 2>&1; adb -s 192.168.0.11:5555 shell am start -W -a android.intent.action.VIEW -d file:///sdcard/Download/ProjectorA4k.jpg -t image/jpeg"
+  cast_control_room_wallpaper_b: >-
+    python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.179'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/Projector%20B%204k.jpg','image/jpeg'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
+  cast_control_room_play_p2: >-
+    python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.179'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/p2.mp4','video/mp4'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
+
+binary_sensor:
+  - platform: ping
+    host: p1.local
+    name: "p1_status"
+  - platform: ping
+    host: p2.local
+    name: "p2_status"
+  - platform: ping
+    host: p3.local
+    name: "p3_status"
+  - platform: ping
+    host: p4.local
+    name: "p4_status"
+  - platform: ping
+    host: p5.local
+    name: "p5_status"
+
+
+
+input_text:
+  p1_trigger_mode: { name: "p1 Trigger", max: 32, initial: "Playback" }
+  p2_trigger_mode: { name: "p2 Trigger", max: 32, initial: "Playback" }
+  p3_trigger_mode: { name: "p3 Trigger", max: 32, initial: "Playback" }
+  p4_trigger_mode: { name: "p4 Trigger", max: 32, initial: "Playback" }
+  p5_trigger_mode: { name: "p5 Trigger", max: 32, initial: "Playback" }
+  p6_trigger_mode: { name: "p6 Trigger", max: 32, initial: "Playback" }
+  p7_trigger_mode: { name: "p7 Trigger", max: 32, initial: "Playback" }
+  p8_trigger_mode: { name: "p8 Trigger", max: 32, initial: "Playback" }
+  p9_trigger_mode: { name: "p9 Trigger", max: 32, initial: "Playback" }
+  p10_trigger_mode: { name: "p10 Trigger", max: 32, initial: "Playback" }
+
+
+input_number:
+  lounge_trigger_guard_minutes:
+    name: Lounge Trigger Guard Minutes
+    min: 1
+    max: 120
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    initial: 10
+
+  control_room_trigger_guard_minutes:
+    name: Control Room Trigger Guard Minutes
+    min: 1
+    max: 120
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    initial: 10
+
+input_datetime:
+  lounge_last_play_trigger:
+    name: Lounge Last Play Trigger
+    has_date: true
+    has_time: true
+
+  shuttle_last_play_trigger:
+    name: Shuttle Last Play Trigger
+    has_date: true
+    has_time: true
+  control_room_last_play_trigger:
+    name: Control Room Last Play Trigger
+    has_date: true
+    has_time: true
+  greenhouse_last_play_trigger:
+    name: Greenhouse Last Play Trigger
+    has_date: true
+    has_time: true
+  galley_last_play_trigger:
+    name: Galley Last Play Trigger
+    has_date: true
+    has_time: true
+
+
+timer:
+  p5_play_guard:
+    name: p5 Play Guard
+    duration: "00:10:00"
+  p5_idle_reset:
+    name: p5 Idle Reset
+    duration: "00:01:00"
+  lounge_idle_reset:
+    name: Lounge Idle Reset
+    duration: "00:01:00"
+  lounge_play_guard:
+    name: Lounge Play Guard
+    duration: "00:10:00"
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+
+
+
+command_line:
+  - sensor:
+      name: Server Disk Free GB
+      unique_id: server_disk_free_gb
+      command: "df -BG / | tail -1 | tr -s ' ' | cut -d' ' -f4 | tr -d 'G'"
+      unit_of_measurement: "GB"
+      scan_interval: 300
+  - sensor:
+      name: Local Media Folder Size GB
+      unique_id: local_media_folder_size_gb
+      command: "/bin/sh -c 'du -sm /config/www 2>/dev/null | cut -f1 || echo 0'"
+      unit_of_measurement: "GB"
+      scan_interval: 300
+
+template:
+  - sensor:
+      - name: Server Storage
+        unique_id: server_storage_status
+        state: >-
+          {% set free = states('sensor.server_disk_free_gb') | float(0) %}
+          {% if free <= 2 %}
+            red
+          {% elif free <= 5 %}
+            yellow
+          {% else %}
+            green
+          {% endif %}
+        icon: >-
+          {% set s = states('sensor.server_storage') %}
+          {% if s == 'red' %} mdi:alert-circle
+          {% elif s == 'yellow' %} mdi:alert
+          {% else %} mdi:check-circle
+          {% endif %}
+      - name: Server Storage Block
+        unique_id: server_storage_block
+        state: >-
+          {% set s = states('sensor.server_storage') %}
+          {% if s == 'red' %} 🟥 RED
+          {% elif s == 'yellow' %} 🟨 YELLOW
+          {% else %} 🟩 GREEN
+          {% endif %}
