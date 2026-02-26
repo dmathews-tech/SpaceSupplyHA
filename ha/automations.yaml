@@ -386,3 +386,36 @@
   action:
   - action: script.launch_shuttle_experience_reset
   mode: restart
+
+
+- id: shuttle_tvs_on_show_idle_wallpapers
+  alias: Shuttle TVs On -> Show Idle Wallpapers
+  trigger:
+  - platform: state
+    entity_id: media_player.firetv_television
+    to: 'on'
+  - platform: state
+    entity_id: media_player.firetv_2aab23fa1b361d7b_television
+    to: 'on'
+  condition: []
+  action:
+  - delay: 00:00:02
+  - action: script.shuttle_show_idle_wallpapers
+  mode: restart
+
+
+- id: shuttle_tvs_media_end_show_idle_wallpapers
+  alias: Shuttle TVs Media End -> Show Idle Wallpapers
+  trigger:
+  - platform: state
+    entity_id: media_player.firetv_television
+    to: idle
+    for: 00:00:10
+  - platform: state
+    entity_id: media_player.firetv_2aab23fa1b361d7b_television
+    to: idle
+    for: 00:00:10
+  condition: []
+  action:
+  - action: script.shuttle_show_idle_wallpapers
+  mode: restart

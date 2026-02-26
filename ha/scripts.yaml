@@ -321,3 +321,22 @@ launch_shuttle_experience_reset:
   - delay: 00:00:01
   - action: script.launch_shuttle_experience
   mode: restart
+
+
+shuttle_show_idle_wallpapers:
+  alias: Shuttle TVs Show Idle Wallpapers
+  sequence:
+  - parallel:
+    - action: media_player.play_media
+      target:
+        entity_id: media_player.firetv_television
+      data:
+        media_content_id: http://192.168.0.10:8123/local/Projector%20A%204k.jpg
+        media_content_type: image/jpeg
+    - action: media_player.play_media
+      target:
+        entity_id: media_player.firetv_2aab23fa1b361d7b_television
+      data:
+        media_content_id: http://192.168.0.10:8123/local/Projector%20B%204k.jpg
+        media_content_type: image/jpeg
+  mode: restart
