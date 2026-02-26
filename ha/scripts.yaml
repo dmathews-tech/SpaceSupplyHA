@@ -88,14 +88,24 @@ play_android_file:
 holodeck_play_both:
   alias: 'Holodeck: Play Both (p6 & p7)'
   sequence:
-  - action: script.play_android_file
-    data:
-      target_entity: media_player.epson_ls800_a
-      file_name: p6
-  - action: script.play_android_file
-    data:
-      target_entity: media_player.epson_ls800_b
-      file_name: p7
+  - variables:
+      guard_minutes: "{{ states('input_number.lounge_trigger_guard_minutes') | int(10) }}"
+      last_dt: "{{ states('input_datetime.lounge_last_play_trigger') }}"
+      within_guard: "{{ (as_timestamp(now()) - as_timestamp(states('input_datetime.lounge_last_play_trigger'))) <= (states('input_number.lounge_trigger_guard_minutes') | int(10) * 60) if states('input_datetime.lounge_last_play_trigger') not in ['unknown','unavailable',''] else false }}"
+      allow_play: "{{ (states('timer.lounge_play_guard') == 'active') or (within_guard | bool) or (force | default(false)) }}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ allow_play | bool }}"
+      sequence:
+      - action: script.play_android_file
+        data:
+          target_entity: media_player.epson_ls800_a
+          file_name: p6
+      - action: script.play_android_file
+        data:
+          target_entity: media_player.epson_ls800_b
+          file_name: p7
 holodeck_power_off_both:
   alias: 'Holodeck: Power Off Both'
   sequence:
