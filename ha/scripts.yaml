@@ -210,19 +210,17 @@ launch_shuttle_experience:
   - action: light.turn_on
     target:
       entity_id: light.h6811
+  - action: homeassistant.turn_on
+    target:
+      entity_id:
+      - media_player.firetv_television
+      - media_player.firetv_2aab23fa1b361d7b_television
+    continue_on_error: true
   - parallel:
-    - action: media_player.play_media
-      target:
-        entity_id: media_player.firetv_television
-      data:
-        media_content_id: http://192.168.0.10:8123/local/p1.mp4
-        media_content_type: movie
-    - action: media_player.play_media
-      target:
-        entity_id: media_player.firetv_2aab23fa1b361d7b_television
-      data:
-        media_content_id: http://192.168.0.10:8123/local/p1.mp4
-        media_content_type: movie
+    - action: shell_command.cast_shuttle_play_p1_95
+      continue_on_error: true
+    - action: shell_command.cast_shuttle_play_p1_89
+      continue_on_error: true
   mode: single
 probe_cast_pair:
   alias: Probe Cast Pair (a_wall+b_wall)
@@ -320,18 +318,10 @@ shuttle_show_idle_wallpapers:
   alias: Shuttle TVs Show Idle Wallpapers
   sequence:
   - parallel:
-    - action: media_player.play_media
-      target:
-        entity_id: media_player.firetv_television
-      data:
-        media_content_id: http://192.168.0.10:8123/local/Projector%20A%204k.jpg
-        media_content_type: image/jpeg
-    - action: media_player.play_media
-      target:
-        entity_id: media_player.firetv_2aab23fa1b361d7b_television
-      data:
-        media_content_id: http://192.168.0.10:8123/local/Projector%20B%204k.jpg
-        media_content_type: image/jpeg
+    - action: shell_command.cast_shuttle_wallpaper_95
+      continue_on_error: true
+    - action: shell_command.cast_shuttle_wallpaper_89
+      continue_on_error: true
   mode: restart
 
 
@@ -386,5 +376,23 @@ launch_button_long_press_toggle:
     - action: light.turn_on
       target:
         entity_id: light.h6811
+      continue_on_error: true
+  mode: restart
+
+
+shuttle_turn_on_and_stream_test:
+  alias: Shuttle Turn On and Stream Test
+  sequence:
+  - action: homeassistant.turn_on
+    target:
+      entity_id:
+      - media_player.firetv_television
+      - media_player.firetv_2aab23fa1b361d7b_television
+    continue_on_error: true
+  - delay: 00:00:01
+  - parallel:
+    - action: shell_command.cast_shuttle_play_p1_95
+      continue_on_error: true
+    - action: shell_command.cast_shuttle_play_p1_89
       continue_on_error: true
   mode: restart

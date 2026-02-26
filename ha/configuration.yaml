@@ -14,6 +14,14 @@ shell_command:
     python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.179'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/Projector%20B%204k.jpg','image/jpeg'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
   cast_control_room_play_p2: >-
     python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.179'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/p2.mp4','video/mp4'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
+  cast_shuttle_play_p1_95: >-
+    python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.95'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/p1.mp4','video/mp4'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
+  cast_shuttle_play_p1_89: >-
+    python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.89'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/p1.mp4','video/mp4'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
+  cast_shuttle_wallpaper_95: >-
+    python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.95'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/Projector%20A%204k.jpg','image/jpeg'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
+  cast_shuttle_wallpaper_89: >-
+    python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.89'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/Projector%20B%204k.jpg','image/jpeg'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
 
 binary_sensor:
   - platform: ping

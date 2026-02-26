@@ -171,7 +171,7 @@
     event_data:
       entity_id: timer.lounge_play_guard
   action:
-  - action: script.show_idle_images_both
+  - action: script.show_idle_image_a
   - action: timer.start
     target:
       entity_id: timer.lounge_idle_reset
@@ -430,3 +430,15 @@
   action:
   - action: script.control_room_show_wallpaper_b
   mode: single
+
+
+- id: launch_button_long_press_toggle_system
+  alias: Launch Button Long Press - Toggle System
+  description: Long press toggles full system on/off based on current device states.
+  trigger:
+  - platform: event
+    event_type: launch_button_long_press
+  condition: []
+  action:
+  - action: script.launch_button_long_press_toggle
+  mode: restart
