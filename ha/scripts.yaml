@@ -78,7 +78,7 @@ play_android_file:
   alias: 'Android: Play File'
   sequence:
   - variables:
-      resolved_target: "{{ 'media_player.a_wall' if target_entity == 'media_player.epson_ls800_a' else ('media_player.b_wall' if target_entity == 'media_player.epson_ls800_b' else target_entity) }}"
+      resolved_target: "{{ 'media_player.a_wall' if target_entity == 'media_player.epson_ls800_a' else ('media_player.ha90' if target_entity == 'media_player.epson_ls800_b' else target_entity) }}"
   - action: media_player.play_media
     target:
       entity_id: '{{ resolved_target }}'
@@ -223,7 +223,7 @@ launch_shuttle_experience:
       continue_on_error: true
   mode: single
 probe_cast_pair:
-  alias: Probe Cast Pair (a_wall+b_wall)
+  alias: Probe Cast Pair (a_wall+ha90)
   sequence:
   - action: media_player.play_media
     target:
