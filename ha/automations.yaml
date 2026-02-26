@@ -149,16 +149,7 @@
           entity_id: input_datetime.lounge_last_play_trigger
         data:
           datetime: '{{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}'
-      - delay: 00:00:01
-      - action: script.play_android_file
-        data:
-          target_entity: media_player.epson_ls800_a
-          file_name: p6
-      - delay: 00:00:01
-      - action: script.play_android_file
-        data:
-          target_entity: media_player.epson_ls800_b
-          file_name: p7
+      - action: script.holodeck_play_both
   id: 2b2c6d7de53847b284d35d90ce6542ab
 - id: standby_button_pending_assignment
   alias: Standby Button - Pending Assignment
@@ -218,6 +209,7 @@
   mode: single
 - id: projectors_on_force_hdmi1
   alias: Projectors On -> Force HDMI 1
+  initial_state: false
   trigger:
   - platform: state
     entity_id: media_player.epson_ls800_a
@@ -328,6 +320,7 @@
   mode: restart
 - id: projector_hdmi1_watchdog_museum_safe
   alias: Projector HDMI1 Watchdog (Museum Safe)
+  initial_state: false
   trigger:
   - platform: time_pattern
     seconds: /15
