@@ -36,7 +36,7 @@ GUARD_CHECK_INTERVAL="${GUARD_CHECK_INTERVAL:-30}"
 FOCUS_REGEX="${FOCUS_REGEX:-gallery3d}"
 
 # Quiet hours (Eastern): stop actions at 01:00 and resume at 09:00.
-QUIET_START_H="${QUIET_START_H:-1}"
+QUIET_START_H="${QUIET_START_H:-0}"
 QUIET_END_H="${QUIET_END_H:-9}"
 TZ_EASTERN="${TZ_EASTERN:-America/New_York}"
 
