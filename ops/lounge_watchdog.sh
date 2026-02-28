@@ -154,11 +154,39 @@ idle_polls=0
 last_apply_ts=0
 last_guard_ts=0
 last_quiet_hr=""
+quiet_powered_off_today=""
+
+quiet_power_off_once() {
+  local today
+  today="$(TZ="$TZ_EASTERN" date +%F)"
+  if [[ "$quiet_powered_off_today" == "$today" ]]; then
+    return 0
+  fi
+
+  local ok_a=0 ok_b=0
+  if adb_ready "$A_IP"; then
+    adb -s "${A_IP}:5555" shell input keyevent KEYCODE_MEDIA_STOP >/dev/null 2>&1 || true
+    adb -s "${A_IP}:5555" shell input keyevent KEYCODE_HOME >/dev/null 2>&1 || true
+    adb -s "${A_IP}:5555" shell input keyevent KEYCODE_SLEEP >/dev/null 2>&1 || true
+    ok_a=1
+  fi
+  if adb_ready "$B_IP"; then
+    adb -s "${B_IP}:5555" shell input keyevent KEYCODE_MEDIA_STOP >/dev/null 2>&1 || true
+    adb -s "${B_IP}:5555" shell input keyevent KEYCODE_HOME >/dev/null 2>&1 || true
+    adb -s "${B_IP}:5555" shell input keyevent KEYCODE_SLEEP >/dev/null 2>&1 || true
+    ok_b=1
+  fi
+
+  log "quiet_power_off_sent ok_a=${ok_a} ok_b=${ok_b}"
+  quiet_powered_off_today="$today"
+}
 
 while true; do
   now="$(date +%s)"
 
   if in_quiet_hours; then
+    quiet_power_off_once
+
     cur_hr="$(TZ="$TZ_EASTERN" date +%Y-%m-%dT%H)"
     if [[ "$last_quiet_hr" != "$cur_hr" ]]; then
       log "quiet_hours active tz='${TZ_EASTERN}'"
