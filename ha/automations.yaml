@@ -453,9 +453,9 @@
   mode: queued
   max: 10
 
-- id: projector_operating_hours_daily_poll
-  alias: Projector Operating Hours - Daily Poll
-  description: Refresh projector operating-hour sensors every 24h at midnight.
+- id: projector_bulb_hours_daily_poll
+  alias: Projector Bulb Hours - Daily Poll
+  description: Refresh projector lamp/laser hour counters every 24h at midnight.
   trigger:
   - platform: time
     at: "00:10:00"
@@ -463,6 +463,6 @@
   - action: homeassistant.update_entity
     target:
       entity_id:
-      - sensor.projector_a_operating_hours
-      - sensor.projector_b_operating_hours
+      - sensor.projector_a_bulb_hours
+      - sensor.projector_b_bulb_hours
   mode: single

@@ -113,24 +113,19 @@ command_line:
       unit_of_measurement: "GB"
       scan_interval: 300
 
-  # Projector operating-hours proxy (Android uptime in hours via ADB)
+  # Projector lamp/laser hours (PJLink %1LAMP query)
+  # Optional auth: set PJLINK_PASSWORD in the HA runtime env, or pass as 2nd arg.
   - sensor:
-      name: Projector A Operating Hours
-      unique_id: projector_a_operating_hours
-      command: >-
-        /bin/sh -c "adb connect 192.168.0.11:5555 >/dev/null 2>&1;
-        adb -s 192.168.0.11:5555 shell cat /proc/uptime 2>/dev/null |
-        awk '{print int($1/3600)}'"
+      name: Projector A Bulb Hours
+      unique_id: projector_a_bulb_hours
+      command: "/bin/bash /config/pjlink_lamp_hours.sh 192.168.0.11"
       unit_of_measurement: "h"
       scan_interval: 86400
 
   - sensor:
-      name: Projector B Operating Hours
-      unique_id: projector_b_operating_hours
-      command: >-
-        /bin/sh -c "adb connect 192.168.0.12:5555 >/dev/null 2>&1;
-        adb -s 192.168.0.12:5555 shell cat /proc/uptime 2>/dev/null |
-        awk '{print int($1/3600)}'"
+      name: Projector B Bulb Hours
+      unique_id: projector_b_bulb_hours
+      command: "/bin/bash /config/pjlink_lamp_hours.sh 192.168.0.12"
       unit_of_measurement: "h"
       scan_interval: 86400
 
