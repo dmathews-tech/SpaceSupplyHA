@@ -275,9 +275,9 @@
         data:
           value: Screensaver
   mode: restart
-- id: projector_hdmi1_watchdog_museum_safe
-  alias: Projector HDMI1 Watchdog (Museum Safe)
-  initial_state: false
+- id: projector_idle_wallpaper_watchdog
+  alias: Projector Idle Wallpaper Watchdog
+  initial_state: true
   trigger:
   - platform: time_pattern
     seconds: /15
@@ -291,7 +291,10 @@
   - condition: template
     value_template: '{{ states(''timer.lounge_idle_reset'') in [''idle'',''active''] }}'
   action:
-  - action: script.force_hdmi1_both
+  - action: script.show_idle_image_a
+    continue_on_error: true
+  - action: script.show_idle_image_b
+    continue_on_error: true
   mode: restart
 - id: launch_button_short_press_shuttle_experience
   alias: Launch Button Short Press - Shuttle Experience
@@ -410,3 +413,56 @@
   action:
   - action: script.launch_button_long_press_toggle
   mode: restart
+
+
+- id: launch_button_1_zha_bridge
+  alias: Launch Button 1 ZHA -> Launch Events Bridge
+  description: Maps raw Launch button ZHA commands to canonical launch_button_* events.
+  trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: 167ab9337b4285a5d971890aa5c57ccd
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.event.data.command == 'single' }}"
+      sequence:
+      - event: launch_button_short_press
+        event_data:
+          source: launch_button_1
+          command: single
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.event.data.command == 'double' }}"
+      sequence:
+      - event: launch_button_double_press
+        event_data:
+          source: launch_button_1
+          command: double
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.event.data.command == 'hold' }}"
+      sequence:
+      - event: launch_button_long_press
+        event_data:
+          source: launch_button_1
+          command: hold
+  mode: queued
+  max: 10
+
+- id: projector_operating_hours_daily_poll
+  alias: Projector Operating Hours - Daily Poll
+  description: Refresh projector operating-hour sensors every 24h at midnight.
+  trigger:
+  - platform: time
+    at: "00:10:00"
+  action:
+  - action: homeassistant.update_entity
+    target:
+      entity_id:
+      - sensor.projector_a_operating_hours
+      - sensor.projector_b_operating_hours
+  mode: single

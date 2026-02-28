@@ -10,6 +10,7 @@ input_boolean:
 shell_command:
   reset_pi: "ssh -i /config/.ssh/id_rsa -o StrictHostKeyChecking=no pi@{{ target }}.local 'sudo systemctl restart pi-button.service jellyfin-shim.service'"
   show_idle_image_a_adb: "adb connect 192.168.0.11:5555 >/dev/null 2>&1; adb -s 192.168.0.11:5555 shell am start -W -a android.intent.action.VIEW -d file:///sdcard/Download/ProjectorA4k.jpg -t image/jpeg"
+  show_idle_image_b_adb: "adb connect 192.168.0.12:5555 >/dev/null 2>&1; adb -s 192.168.0.12:5555 shell am start -W -a android.intent.action.VIEW -d file:///sdcard/Download/ProjectorB4k.jpg -t image/jpeg"
   cast_control_room_wallpaper_b: >-
     python3 -c "import pychromecast,time; casts,b=pychromecast.get_chromecasts(known_hosts=['192.168.0.179'], timeout=5); cc=casts[0] if casts else None; print('no_cast') if cc is None else (cc.wait(timeout=5), cc.media_controller.play_media('http://192.168.0.10:8123/local/Projector%20B%204k.jpg','image/jpeg'), time.sleep(1), pychromecast.discovery.stop_discovery(b))"
   cast_control_room_play_p2: >-
@@ -111,6 +112,27 @@ command_line:
       command: "/bin/sh -c 'du -sm /config/www 2>/dev/null | cut -f1 || echo 0'"
       unit_of_measurement: "GB"
       scan_interval: 300
+
+  # Projector operating-hours proxy (Android uptime in hours via ADB)
+  - sensor:
+      name: Projector A Operating Hours
+      unique_id: projector_a_operating_hours
+      command: >-
+        /bin/sh -c "adb connect 192.168.0.11:5555 >/dev/null 2>&1;
+        adb -s 192.168.0.11:5555 shell cat /proc/uptime 2>/dev/null |
+        awk '{print int($1/3600)}'"
+      unit_of_measurement: "h"
+      scan_interval: 86400
+
+  - sensor:
+      name: Projector B Operating Hours
+      unique_id: projector_b_operating_hours
+      command: >-
+        /bin/sh -c "adb connect 192.168.0.12:5555 >/dev/null 2>&1;
+        adb -s 192.168.0.12:5555 shell cat /proc/uptime 2>/dev/null |
+        awk '{print int($1/3600)}'"
+      unit_of_measurement: "h"
+      scan_interval: 86400
 
 template:
   - sensor:
